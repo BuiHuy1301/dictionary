@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.mydictionary.android.databinding.TranslationFragmentBinding
-import com.example.mydictionary.android.viewmodel.DataUpdater
+import com.example.mydictionary.android.listener.DataUpdater
 import com.example.mydictionary.android.viewmodel.FragmentViewModel
 
 class TranslationFragment(val title: String,val detail: String) : Fragment() {
@@ -22,7 +22,7 @@ class TranslationFragment(val title: String,val detail: String) : Fragment() {
         viewModel = ViewModelProvider(this)[FragmentViewModel::class.java]
         binding = TranslationFragmentBinding.inflate(inflater, container, false)
         binding.detail.movementMethod = ScrollingMovementMethod()
-        (activity as MainActivity).setDataUpdater(object : DataUpdater{
+        (activity as MainActivity).setDataUpdater(object : DataUpdater {
             override fun updateData(title: String, description: String) {
                 Log.d("huybv", "updateData: $title")
                 binding.detail.text = description

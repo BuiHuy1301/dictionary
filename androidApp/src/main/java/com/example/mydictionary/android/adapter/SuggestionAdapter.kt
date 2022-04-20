@@ -7,8 +7,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mydictionary.android.R
+import com.example.mydictionary.android.listener.ItemClickListener
 
-class SuggestionAdapter(var suggestionList: List<String>) :
+class SuggestionAdapter(var keywordList: List<String>) :
     RecyclerView.Adapter<SuggestionAdapter.ViewHolder>() {
 
     var mItemClickListener: ItemClickListener? = null
@@ -20,7 +21,7 @@ class SuggestionAdapter(var suggestionList: List<String>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val text = suggestionList[position]
+        val text = keywordList[position]
         holder.textView.text = text
         holder.itemView.setOnClickListener {
             mItemClickListener?.onClickItem(text)
@@ -36,7 +37,7 @@ class SuggestionAdapter(var suggestionList: List<String>) :
     }
 
     override fun getItemCount(): Int {
-        return suggestionList.size
+        return keywordList.size
     }
 
     fun setItemClickListener(itemClickListener: ItemClickListener) {

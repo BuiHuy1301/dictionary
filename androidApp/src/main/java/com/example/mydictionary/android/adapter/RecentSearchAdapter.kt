@@ -7,11 +7,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mydictionary.android.R
+import com.example.mydictionary.android.listener.ItemFragmentClickListener
 
-class RecentSearchAdapter(private val suggestionList: List<String>) :
+class RecentSearchAdapter(var list: ArrayList<String>) :
     RecyclerView.Adapter<RecentSearchAdapter.ViewHolder>() {
 
-    var mItemClickListener: ItemClickListener? = null
+    var mItemClickListener: ItemFragmentClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -20,7 +21,7 @@ class RecentSearchAdapter(private val suggestionList: List<String>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val text = suggestionList[position]
+        val text = list[position]
         holder.textView.text = text
         holder.itemView.setOnClickListener {
             mItemClickListener?.onClickItem(text)
@@ -36,10 +37,10 @@ class RecentSearchAdapter(private val suggestionList: List<String>) :
     }
 
     override fun getItemCount(): Int {
-        return suggestionList.size
+        return list.size
     }
 
-    fun setItemClickListener(itemClickListener: ItemClickListener) {
+    fun setItemClickListener(itemClickListener: ItemFragmentClickListener) {
         mItemClickListener = itemClickListener
     }
 

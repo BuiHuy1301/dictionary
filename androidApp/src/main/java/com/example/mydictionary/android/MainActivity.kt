@@ -1,20 +1,21 @@
 package com.example.mydictionary.android
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mydictionary.Util
-import com.example.mydictionary.android.adapter.ItemClickListener
+import com.example.mydictionary.android.listener.ItemClickListener
 import com.example.mydictionary.android.adapter.SuggestionAdapter
 import com.example.mydictionary.android.databinding.ActivityMainBinding
-import com.example.mydictionary.android.viewmodel.DataUpdater
+import com.example.mydictionary.android.listener.DataUpdater
 import com.example.mydictionary.android.viewmodel.DictionaryViewModel
 import com.example.mydictionary.preferences.KMMStorage
 import kotlinx.coroutines.*
@@ -32,80 +33,77 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[DictionaryViewModel::class.java]
         initData()
         setContentView(binding.root)
-        time = System.currentTimeMillis()
-        binding.suggestionList.layoutManager = LinearLayoutManager(this)
-        binding.suggestionList.visibility = View.GONE
+        binding.suggestionRv.layoutManager = LinearLayoutManager(this)
         registerListener()
         registerLiveDataObserver()
     }
 
     private fun initData() {
+        time = System.currentTimeMillis()
         CoroutineScope(Dispatchers.IO).launch {
             viewModel.setupData(applicationContext)
+            viewModel.kmmStorage = KMMStorage(this@MainActivity)
         }
-        val recentSearchFragment = RecentSearchFragment()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, recentSearchFragment, "")
-        transaction.commit()
         val list = ArrayList<String>()
         adapter = SuggestionAdapter(list)
         adapter.setItemClickListener(object : ItemClickListener {
             override fun onClickItem(string: String?) {
-                binding.searchBar.setText(string)
                 searchKeyWord(string)
             }
 
             override fun onClickFillButton(string: String?) {
-                if (string != null) {
-                    binding.searchBar.setText(string)
-                    binding.searchBar.setSelection(string.length)
-                }
+                fillTextToSearchBar(string)
             }
-
         })
-        binding.suggestionList.adapter = adapter
+        binding.suggestionRv.adapter = adapter
+        changeFragment(RecentSearchFragment(), "")
+    }
+
+    fun fillTextToSearchBar(string: String?) {
+        if (string != null) {
+            binding.searchBar.setText(string)
+            binding.searchBar.setSelection(string.length)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d("huybv", "onResume: ${System.currentTimeMillis() - time}")
+        binding.suggestionRv.visibility = View.GONE
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun registerLiveDataObserver() {
         viewModel.result.observe(this) {
-            Log.d("huybv", "registerLiveDataObserver: ${System.currentTimeMillis() - time}")
-            val title: String
-            val description: String
             viewModel.closeKeyboard(this)
-            if (it == "/") {
-                title = ""
-                description =
-                    "Translation of \"${binding.searchBar.text}\" is not available, please try again with another keyword"
-            } else {
-                title = binding.searchBar.text.toString()
-                description = it
-            }
 
             if (isFragmentAlive() && mDataUpdater != null) {
-                mDataUpdater!!.updateData(title, description)
+                mDataUpdater!!.updateData(viewModel.keyword, it)
             } else {
-                val translationFragment = TranslationFragment(title, description)
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragment_container, translationFragment, Util.FRAGMENT_TAG)
-                transaction.commit()
+                changeFragment(TranslationFragment(viewModel.keyword, it), Util.FRAGMENT_TAG)
             }
         }
 
         viewModel.suggestionList.observe(this) {
-            adapter.suggestionList = it
+            adapter.keywordList = it
             adapter.notifyDataSetChanged()
-            binding.suggestionList.visibility = View.VISIBLE
+            binding.suggestionRv.visibility = View.VISIBLE
         }
     }
 
+
+    private fun changeFragment(fragment: Fragment, tag: String) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment, tag)
+        transaction.commit()
+    }
+
     fun searchKeyWord(keyword: String?) {
+        binding.searchBar.setText(keyword)
         viewModel.searchKeyword(keyword)
-        binding.suggestionList.visibility = View.GONE
+        binding.suggestionRv.visibility = View.GONE
+        if (keyword != null) {
+            viewModel.putStringToSP(keyword)
+        }
     }
 
     private fun registerListener() {
@@ -141,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        binding.suggestionList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.suggestionRv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 viewModel.closeKeyboard(this@MainActivity)
@@ -155,10 +153,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (binding.suggestionList.visibility == View.VISIBLE) {
-            binding.suggestionList.visibility = View.GONE
-        } else {
-            finish()
+        when {
+
+            binding.suggestionRv.visibility == View.VISIBLE -> {
+                binding.suggestionRv.visibility = View.GONE
+            }
+
+            isFragmentAlive() -> {
+                changeFragment(RecentSearchFragment(), "")
+            }
+
+            else -> {
+                finish()
+            }
         }
     }
 

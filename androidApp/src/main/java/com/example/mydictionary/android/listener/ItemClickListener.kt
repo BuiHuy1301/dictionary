@@ -1,4 +1,4 @@
-package com.example.mydictionary.android.adapter
+package com.example.mydictionary.android.listener
 
 interface ItemClickListener {
     fun onClickItem(string: String?)

@@ -7,10 +7,10 @@ import com.example.mydictionary.preferences.KMMStorage
 
 class FragmentViewModel : ViewModel() {
     var kmmStorage: KMMStorage? = null
-    var recentUsedKeywordList = MutableLiveData<List<String>>()
+    var recentUsedKeywordList = MutableLiveData<ArrayList<String>>()
 
     fun getList(key: String) {
-        recentUsedKeywordList.value = kmmStorage?.getList(key)?.split("|")
+        recentUsedKeywordList.value = kmmStorage?.getList(key)
     }
 
     fun setRecentList(key: String, value: String) {
