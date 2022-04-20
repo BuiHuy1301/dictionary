@@ -1,0 +1,8 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="recent_find_word">Từ khóa gợi ý</string>
+    <string name="copyright">Copyright © 2022 by Bui Viet Huy / IFI Solution</string>
+    <string name="keyword_hint">Type your keyword here!</string>
+    <string name="app_name">My Dictionary</string>
+</resources>
