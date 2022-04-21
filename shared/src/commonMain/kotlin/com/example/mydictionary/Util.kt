@@ -6,4 +6,5 @@ object Util {
     const val SHORT_TRANSLATION_FILE_NAME = "withoutspelling.txt"
     const val FRAGMENT_TAG = "translation_fragment"
     const val RECENT_LIST_STORAGE_KEY = "storage_key"
+    const val SP_NAME = "dictionary_app"
 }

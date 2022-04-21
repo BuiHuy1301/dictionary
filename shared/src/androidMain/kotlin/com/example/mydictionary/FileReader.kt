@@ -9,13 +9,13 @@ import com.example.mydictionary.Util.SHORT_TRANSLATION_FILE_NAME
 import java.io.IOException
 import java.io.InputStream
 
-actual class FileReader{
+actual class FileReader {
     var inputStream: AssetManager? = null
     var keywordList: ArrayList<String>? = null
     var detailTranslationList: ArrayList<String>? = null
-    var shortTranslationList : ArrayList<String>? = null
+    var shortTranslationList: ArrayList<String>? = null
 
-    fun createInputStream(context: Context){
+    fun createInputStream(context: Context) {
         inputStream = context.assets
         keywordList = queryFile(inputStream?.open(KEYWORD_FILE_NAME))
         detailTranslationList = queryFile(inputStream?.open(DETAIL_TRANSLATION_FILE_NAME))
@@ -25,7 +25,7 @@ actual class FileReader{
     fun querySuggestions(keyword: String): ArrayList<String>? {
         var suggestions: ArrayList<String>? = null
         try {
-            keywordList?:let {
+            keywordList ?: let {
                 keywordList = queryFile(inputStream?.open(KEYWORD_FILE_NAME))
             }
             suggestions = SuggestionsProvider().getSuggestions(keywordList!!, keyword)
@@ -43,7 +43,7 @@ actual class FileReader{
         return lineList
     }
 
-    fun searchKeyword(keyword: String) : String {
+    fun searchKeyword(keyword: String): String {
         try {
             detailTranslationList ?: let {
                 detailTranslationList = queryFile(inputStream?.open(DETAIL_TRANSLATION_FILE_NAME))
@@ -51,17 +51,21 @@ actual class FileReader{
             shortTranslationList ?: let {
                 shortTranslationList = queryFile(inputStream?.open(SHORT_TRANSLATION_FILE_NAME))
             }
-            return SuggestionsProvider().findTranslation(detailTranslationList!!, shortTranslationList!!, keyword)
+            return SuggestionsProvider().findTranslation(
+                detailTranslationList!!,
+                shortTranslationList!!,
+                keyword
+            )
         } catch (e: IOException) {
             e.printStackTrace()
         }
         return ""
     }
 
-    object FileReaderBuilder{
+    object FileReaderBuilder {
         var instances: FileReader? = null
-        fun getInstance(): FileReader{
-            if(instances == null){
+        fun getInstance(): FileReader {
+            if (instances == null) {
                 instances = FileReader()
             }
             return instances!!

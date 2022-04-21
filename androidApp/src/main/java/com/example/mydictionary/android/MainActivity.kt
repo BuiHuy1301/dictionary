@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             viewModel.setupData(applicationContext)
             viewModel.kmmStorage = KMMStorage(this@MainActivity)
+            viewModel.checkSPExist(this@MainActivity)
         }
         val list = ArrayList<String>()
         adapter = SuggestionAdapter(list)
@@ -86,7 +87,11 @@ class MainActivity : AppCompatActivity() {
         viewModel.suggestionList.observe(this) {
             adapter.keywordList = it
             adapter.notifyDataSetChanged()
-            binding.suggestionRv.visibility = View.VISIBLE
+            if (it.isEmpty()) {
+                binding.suggestionRv.visibility = View.GONE
+            } else {
+                binding.suggestionRv.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -112,9 +117,27 @@ class MainActivity : AppCompatActivity() {
             searchKeyWord(binding.searchBar.text.toString())
         }
 
+        binding.searchBar.setOnClickListener {
+            if (binding.searchBar.text.isNotEmpty()
+                && viewModel.suggestionList.value != null
+                && viewModel.suggestionList.value!!.isNotEmpty()
+            ) {
+                binding.suggestionRv.visibility = View.VISIBLE
+            }
+        }
+
+        binding.mainView.setOnClickListener {
+            if (binding.suggestionRv.visibility == View.VISIBLE) {
+                binding.suggestionRv.visibility = View.GONE
+            }
+            viewModel.closeKeyboard(this)
+        }
         binding.searchBar.addTextChangedListener(object : TextWatcher {
 
             override fun afterTextChanged(s: Editable) {
+                if (binding.searchBar.text.isEmpty()){
+                    binding.suggestionRv.visibility = View.GONE
+                }
             }
 
             override fun beforeTextChanged(
@@ -134,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         binding.searchBar.setOnKeyListener { _, p1, _ ->
             if (p1 == KeyEvent.KEYCODE_ENTER) {
                 viewModel.searchKeyword(binding.searchBar.text.toString())
-                viewModel.closeKeyboard(this@MainActivity)
+                viewModel.closeKeyboard(this)
             }
             false
         }

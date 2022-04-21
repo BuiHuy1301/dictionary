@@ -2,23 +2,29 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp">
+
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textSize="20sp"
-        android:layout_marginStart="10dp"/>
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="50dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="20sp" />
+
     <Button
         android:id="@+id/fill_button"
         android:layout_width="50dp"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical|end"
         android:background="@drawable/fill_button"
-        android:rotation="45"
-        android:layout_gravity="center_vertical|end"/>
+        android:rotation="45" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_gravity="bottom"
-        android:background="#55555555"/>
+        android:background="#55555555" />
 </androidx.cardview.widget.CardView>

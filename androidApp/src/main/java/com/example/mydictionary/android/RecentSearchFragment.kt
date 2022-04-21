@@ -15,6 +15,9 @@ import com.example.mydictionary.android.adapter.RecentSearchAdapter
 import com.example.mydictionary.android.databinding.FragmentRecentSearchBinding
 import com.example.mydictionary.android.viewmodel.FragmentViewModel
 import com.example.mydictionary.preferences.KMMStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class RecentSearchFragment : Fragment() {
